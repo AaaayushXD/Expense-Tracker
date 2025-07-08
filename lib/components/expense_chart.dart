@@ -63,19 +63,21 @@ class ExpenseChart extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Container(
-                          width: 30.w,
-                          height: actualBarHeight.h,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.blue.withValues(alpha: 0.8),
-                                Colors.blue,
-                              ],
+                        Flexible(
+                          child: Container(
+                            width: 30.w,
+                            height: actualBarHeight.h,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.blue.withValues(alpha: 0.8),
+                                  Colors.blue,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(15.r),
                             ),
-                            borderRadius: BorderRadius.circular(15.r),
                           ),
                         ),
                         SizedBox(height: 8.h),

@@ -209,8 +209,6 @@ class ProfileScreen extends StatelessWidget {
             Icons.notifications_outlined,
             () {},
           ),
-          _buildSettingItem('Privacy & Security', Icons.security, () {}),
-          _buildSettingItem('Currency', Icons.attach_money, () {}),
           _buildSettingItem('Export Data', Icons.download, () {}),
           _buildSettingItem('Help & Support', Icons.help_outline, () {}),
           _buildSettingItem('About', Icons.info_outline, () {}),
@@ -234,12 +232,9 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildLogoutButton() {
     return CustomButton(
       text: 'Logout',
-      onPressed: () {
-        // TODO: Implement logout
-      },
-      backgroundColor: Colors.red,
+      onPressed: () {},
+      backgroundColor: Colors.red[400]!,
       textColor: Colors.white,
-      isOutlined: true,
     );
   }
 }

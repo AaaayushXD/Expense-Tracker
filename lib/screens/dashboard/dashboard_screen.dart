@@ -105,36 +105,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
               SizedBox(height: 30.h),
 
               // Stats Cards
-              SizedBox(
-                height: 120.h,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    SizedBox(
-                      width: 160.w,
-                      child: StatCard(
-                        title: 'Total Spent',
-                        value: '\$1,234',
-                        subtitle: '+12% from last month',
-                        icon: Icons.trending_up,
-                        color: Colors.green,
-                        isPositive: true,
-                      ),
+              Row(
+                children: [
+                  Flexible(
+                    child: StatCard(
+                      title: 'Total Spent',
+                      value: '\$1,234',
+                      subtitle: '+12% from last month',
+                      icon: Icons.trending_up,
+                      color: Colors.green,
+                      isPositive: true,
                     ),
-                    SizedBox(width: 16.w),
-                    SizedBox(
-                      width: 160.w,
-                      child: StatCard(
-                        title: 'Budget Left',
-                        value: '\$766',
-                        subtitle: '65% of budget remaining',
-                        icon: Icons.account_balance_wallet,
-                        color: Colors.blue,
-                        isPositive: true,
-                      ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Flexible(
+                    child: StatCard(
+                      title: 'Budget Left',
+                      value: '\$766',
+                      subtitle: '65% of budget remaining',
+                      icon: Icons.account_balance_wallet,
+                      color: Colors.blue,
+                      isPositive: true,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               SizedBox(height: 24.h),
 

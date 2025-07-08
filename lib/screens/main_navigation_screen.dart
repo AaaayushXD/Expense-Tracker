@@ -95,36 +95,45 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }) {
     final isActive = _currentIndex == index;
 
-    return GestureDetector(
-      onTap: () => _onNavItemTapped(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(
-              color: isActive
-                  ? Colors.blue.withValues(alpha: 0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Icon(
-              isActive ? activeIcon : icon,
-              color: isActive ? Colors.blue : Colors.grey[600],
-              size: 24.sp,
-            ),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _onNavItemTapped(index),
+        child: SizedBox(
+          height: 60.h,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: EdgeInsets.all(6.w),
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? Colors.blue.withValues(alpha: 0.1)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Icon(
+                  isActive ? activeIcon : icon,
+                  color: isActive ? Colors.blue : Colors.grey[600],
+                  size: 20.sp,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                  color: isActive ? Colors.blue : Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          SizedBox(height: 4.h),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-              color: isActive ? Colors.blue : Colors.grey[600],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

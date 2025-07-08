@@ -22,7 +22,6 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120.h,
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -36,50 +35,52 @@ class StatCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40.w,
-                height: 40.h,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10.r),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40.w,
+                  height: 40.h,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Icon(icon, color: color, size: 20.sp),
                 ),
-                child: Icon(icon, color: color, size: 20.sp),
+                // const Spacer(),
+                // Icon(
+                //   isPositive ? Icons.trending_up : Icons.trending_down,
+                //   color: isPositive ? Colors.green : Colors.red,
+                //   size: 20.sp,
+                // ),
+              ],
+            ),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
               ),
-              const Spacer(),
-              Icon(
-                isPositive ? Icons.trending_up : Icons.trending_down,
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.bold,
                 color: isPositive ? Colors.green : Colors.red,
-                size: 20.sp,
               ),
-            ],
-          ),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
             ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
-              color: isPositive ? Colors.green : Colors.red,
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
             ),
-          ),
-          Text(
-            subtitle,
-            style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

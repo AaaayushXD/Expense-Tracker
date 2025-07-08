@@ -57,6 +57,8 @@ class AnalyticsScreen extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
           children: [
             Expanded(
               child: StatCard(
