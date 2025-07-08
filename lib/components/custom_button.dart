@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -11,6 +12,7 @@ class CustomButton extends StatelessWidget {
   final double height;
   final double borderRadius;
   final Widget? icon;
+  final Gradient? gradient;
 
   const CustomButton({
     super.key,
@@ -24,6 +26,7 @@ class CustomButton extends StatelessWidget {
     this.height = 50,
     this.borderRadius = 12,
     this.icon,
+    this.gradient,
   });
 
   @override
@@ -35,38 +38,44 @@ class CustomButton extends StatelessWidget {
 
     return SizedBox(
       width: width ?? double.infinity,
-      height: height,
+      height: height.h,
       child: isOutlined
           ? OutlinedButton(
               onPressed: isLoading ? null : onPressed,
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: primaryColor, width: 2),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(borderRadius),
+                  borderRadius: BorderRadius.circular(borderRadius.r),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
               ),
               child: _buildButtonContent(buttonTextColor),
             )
           : ElevatedButton(
               onPressed: isLoading ? null : onPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
+                backgroundColor: gradient == null ? primaryColor : null,
                 foregroundColor: buttonTextColor,
                 elevation: 2,
-                shadowColor: primaryColor.withOpacity(0.3),
+                shadowColor: primaryColor.withValues(alpha: 0.3),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(borderRadius),
+                  borderRadius: BorderRadius.circular(borderRadius.r),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
               ),
-              child: _buildButtonContent(buttonTextColor),
+              child: gradient == null
+                  ? _buildButtonContent(buttonTextColor)
+                  : Ink(
+                      decoration: BoxDecoration(
+                        gradient: gradient,
+                        borderRadius: BorderRadius.circular(borderRadius.r),
+                      ),
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: height.h,
+                        child: _buildButtonContent(Colors.white),
+                      ),
+                    ),
             ),
     );
   }
@@ -74,8 +83,8 @@ class CustomButton extends StatelessWidget {
   Widget _buildButtonContent(Color textColor) {
     if (isLoading) {
       return SizedBox(
-        height: 20,
-        width: 20,
+        height: 20.h,
+        width: 20.w,
         child: CircularProgressIndicator(
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation<Color>(textColor),
@@ -88,11 +97,11 @@ class CustomButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           icon!,
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Text(
             text,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w600,
               color: textColor,
             ),
@@ -104,7 +113,7 @@ class CustomButton extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        fontSize: 16,
+        fontSize: 16.sp,
         fontWeight: FontWeight.w600,
         color: textColor,
       ),

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../components/custom_text_field.dart';
-import '../components/custom_button.dart';
-import '../providers/auth_provider.dart';
-import 'home_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../components/custom_text_field.dart';
+import '../../components/custom_button.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -69,19 +68,14 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.signup(
-      _nameController.text.trim(),
-      _emailController.text.trim(),
-      _passwordController.text,
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Signup disabled for UI testing.',
+          style: TextStyle(fontSize: 14.sp),
+        ),
+      ),
     );
-
-    if (success && mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    }
   }
 
   void _navigateToLogin() {
@@ -91,55 +85,49 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(24.w),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 60),
-
+                SizedBox(height: 60.h),
                 // App Logo/Icon
                 Container(
-                  height: 120,
-                  width: 120,
+                  height: 120.h,
+                  width: 120.w,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(60),
+                    color: const Color(0xFF005BEA).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(60.r),
                   ),
                   child: Icon(
                     Icons.account_balance_wallet,
-                    size: 60,
-                    color: Theme.of(context).primaryColor,
+                    size: 60.sp,
+                    color: const Color(0xFF005BEA),
                   ),
                 ),
-
-                const SizedBox(height: 32),
-
+                SizedBox(height: 32.h),
                 // Welcome Text
                 Text(
                   'Create Account',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  style: TextStyle(
+                    fontSize: 28.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
+                    letterSpacing: 1.2,
+                    color: Colors.black,
                   ),
                   textAlign: TextAlign.center,
                 ),
-
-                const SizedBox(height: 8),
-
+                SizedBox(height: 8.h),
                 Text(
                   'Sign up to start tracking your expenses',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 16.sp, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
-
-                const SizedBox(height: 48),
-
+                SizedBox(height: 48.h),
                 // Name Field
                 CustomTextField(
                   label: 'Name',
@@ -148,12 +136,11 @@ class _SignupScreenState extends State<SignupScreen> {
                   validator: _validateName,
                   prefixIcon: Icon(
                     Icons.person_outline,
-                    color: Colors.grey[600],
+                    color: Colors.grey,
+                    size: 20.sp,
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
+                SizedBox(height: 20.h),
                 // Email Field
                 CustomTextField(
                   label: 'Email',
@@ -163,12 +150,11 @@ class _SignupScreenState extends State<SignupScreen> {
                   validator: _validateEmail,
                   prefixIcon: Icon(
                     Icons.email_outlined,
-                    color: Colors.grey[600],
+                    color: Colors.grey,
+                    size: 20.sp,
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
+                SizedBox(height: 20.h),
                 // Password Field
                 CustomTextField(
                   label: 'Password',
@@ -176,11 +162,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _passwordController,
                   isPassword: true,
                   validator: _validatePassword,
-                  prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[600]),
+                  prefixIcon: Icon(
+                    Icons.lock_outline,
+                    color: Colors.grey,
+                    size: 20.sp,
+                  ),
                 ),
-
-                const SizedBox(height: 20),
-
+                SizedBox(height: 20.h),
                 // Confirm Password Field
                 CustomTextField(
                   label: 'Confirm Password',
@@ -188,77 +176,72 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _confirmPasswordController,
                   isPassword: true,
                   validator: _validateConfirmPassword,
-                  prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[600]),
+                  prefixIcon: Icon(
+                    Icons.lock_outline,
+                    color: Colors.grey,
+                    size: 20.sp,
+                  ),
                 ),
-
-                const SizedBox(height: 32),
-
+                SizedBox(height: 32.h),
                 // Signup Button
-                Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
-                    return CustomButton(
-                      text: 'Sign Up',
-                      onPressed: _handleSignup,
-                      isLoading: authProvider.isLoading,
-                      icon: const Icon(Icons.person_add, size: 20),
+                CustomButton(
+                  text: 'Sign Up',
+                  onPressed: _handleSignup,
+                  isLoading: false,
+                  icon: Icon(
+                    Icons.person_add,
+                    size: 20.sp,
+                    color: Colors.white,
+                  ),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF005BEA), Color(0xFF00C6FB)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Expanded(child: Divider()),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w),
+                      child: Text(
+                        'OR',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Divider()),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                SignInButton(
+                  Buttons.Google,
+                  text: 'Sign up with Google',
+                  onPressed: () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Google sign-up disabled for UI testing.',
+                          style: TextStyle(fontSize: 14.sp),
+                        ),
+                      ),
                     );
                   },
                 ),
-
-                const SizedBox(height: 24),
-
-                // Error Message
-                Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
-                    if (authProvider.error != null) {
-                      return Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.red[50],
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.red[200]!),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              color: Colors.red[600],
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                authProvider.error!,
-                                style: TextStyle(color: Colors.red[700]),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.close,
-                                color: Colors.red[600],
-                                size: 20,
-                              ),
-                              onPressed: authProvider.clearError,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-
-                const SizedBox(height: 32),
-
+                SizedBox(height: 32.h),
                 // Login Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "Already have an account? ",
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14.sp,
+                      ),
                     ),
                     TextButton(
                       onPressed: _navigateToLogin,
@@ -267,13 +250,13 @@ class _SignupScreenState extends State<SignupScreen> {
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.w600,
+                          fontSize: 14.sp,
                         ),
                       ),
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 40),
+                SizedBox(height: 40.h),
               ],
             ),
           ),
