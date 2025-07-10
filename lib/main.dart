@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:get/get.dart';
 import 'screens/dashboard/dashboard_screen.dart';
+import 'firebase_options.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -19,7 +24,7 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
+        return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Expense Tracker',
           theme: ThemeData(
@@ -51,12 +56,12 @@ class MyApp extends StatelessWidget {
             ),
           ),
           home: const MainNavigationScreen(),
-          routes: {
-            '/dashboard': (context) => const DashboardScreen(),
-            '/main': (context) => const MainNavigationScreen(),
-            '/login': (context) => const LoginScreen(),
-            '/signup': (context) => const SignupScreen(),
-          },
+          getPages: [
+            GetPage(name: '/dashboard', page: () => const DashboardScreen()),
+            GetPage(name: '/main', page: () => const MainNavigationScreen()),
+            GetPage(name: '/login', page: () => const LoginScreen()),
+            GetPage(name: '/signup', page: () => const SignupScreen()),
+          ],
         );
       },
     );

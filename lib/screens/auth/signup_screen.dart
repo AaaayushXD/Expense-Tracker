@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../components/custom_text_field.dart';
 import '../../components/custom_button.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'controllers/signup.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -68,14 +69,49 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Signup disabled for UI testing.',
-          style: TextStyle(fontSize: 14.sp),
-        ),
-      ),
-    );
+    try {
+      await SignupController().signup(
+        _emailController.text,
+        _passwordController.text,
+      );
+    } catch (e) {
+      print('Signup Failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString(), style: TextStyle(fontSize: 14.sp)),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleSignupWithGoogle() async {
+    try {
+      await SignupController().signupWithGoogle();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Signup Successful',
+              style: TextStyle(fontSize: 14.sp),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Signup Failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString(), style: TextStyle(fontSize: 14.sp)),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _navigateToLogin() {
@@ -220,16 +256,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 SignInButton(
                   Buttons.Google,
                   text: 'Sign up with Google',
-                  onPressed: () async {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Google sign-up disabled for UI testing.',
-                          style: TextStyle(fontSize: 14.sp),
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: _handleSignupWithGoogle,
                 ),
                 SizedBox(height: 32.h),
                 // Login Link

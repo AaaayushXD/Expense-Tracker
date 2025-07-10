@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../components/custom_button.dart';
+import '../auth/login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -36,7 +37,7 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(height: 24.h),
               _buildSettingsSection(),
               SizedBox(height: 24.h),
-              _buildLogoutButton(),
+              _buildLogoutButton(context),
             ],
           ),
         ),
@@ -229,10 +230,15 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutButton() {
+  Widget _buildLogoutButton(BuildContext context) {
     return CustomButton(
       text: 'Logout',
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      },
       backgroundColor: Colors.red[400]!,
       textColor: Colors.white,
     );

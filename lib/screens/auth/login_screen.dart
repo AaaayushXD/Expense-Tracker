@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../components/custom_text_field.dart';
 import '../../components/custom_button.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'controllers/login.dart';
+import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,14 +49,28 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Login disabled for UI testing.',
-          style: TextStyle(fontSize: 14.sp),
-        ),
-      ),
+    await LoginController().login(
+      _emailController.text,
+      _passwordController.text,
     );
+  }
+
+  Future<void> _handleLoginWithGoogle() async {
+    try {
+      await LoginController().signInWithGoogle();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Google sign-in failed: ${e.toString()}',
+              style: TextStyle(fontSize: 14.sp),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _navigateToSignup() {
@@ -193,16 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SignInButton(
                   Buttons.Google,
                   text: 'Sign in with Google',
-                  onPressed: () async {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Google sign-in disabled for UI testing.',
-                          style: TextStyle(fontSize: 14.sp),
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: _handleLoginWithGoogle,
                 ),
                 SizedBox(height: 24.h),
                 // Sign Up Link

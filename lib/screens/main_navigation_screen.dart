@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'dart:io';
+import '../services/image_service.dart';
 import 'add_expense_screen.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'analytics/analytics_screen.dart';
@@ -29,168 +32,154 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: _buildBottomNavigation(),
-      floatingActionButton: _currentIndex == 2
-          ? _buildFloatingActionButton()
-          : null,
     );
   }
 
   Widget _buildBottomNavigation() {
-    return Container(
-      height: 80.h,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home,
-                label: 'Home',
-                index: 0,
-              ),
-              _buildNavItem(
-                icon: Icons.analytics_outlined,
-                activeIcon: Icons.analytics,
-                label: 'Analytics',
-                index: 1,
-              ),
-              _buildAddButton(),
-              _buildNavItem(
-                icon: Icons.account_balance_wallet_outlined,
-                activeIcon: Icons.account_balance_wallet,
-                label: 'Wallet',
-                index: 3,
-              ),
-              _buildNavItem(
-                icon: Icons.person_outline,
-                activeIcon: Icons.person,
-                label: 'Profile',
-                index: 4,
-              ),
-            ],
-          ),
+    return CurvedNavigationBar(
+      backgroundColor: Colors.transparent,
+      color: Colors.white,
+      buttonBackgroundColor: Colors.blue,
+      height: 60.0,
+      animationDuration: const Duration(milliseconds: 300),
+      index: _currentIndex,
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+
+        if (index == 2) {
+          // Handle add expense button
+          _onAddExpenseTapped();
+        }
+      },
+      items: [
+        Icon(
+          Icons.home,
+          size: 24.sp,
+          color: _currentIndex == 0 ? Colors.white : Colors.grey[600],
         ),
-      ),
+        Icon(
+          Icons.analytics,
+          size: 24.sp,
+          color: _currentIndex == 1 ? Colors.white : Colors.grey[600],
+        ),
+        Icon(
+          Icons.add,
+          size: 28.sp,
+          color: _currentIndex == 2 ? Colors.white : Colors.grey[600],
+        ),
+        Icon(
+          Icons.account_balance_wallet,
+          size: 24.sp,
+          color: _currentIndex == 3 ? Colors.white : Colors.grey[600],
+        ),
+        Icon(
+          Icons.person,
+          size: 24.sp,
+          color: _currentIndex == 4 ? Colors.white : Colors.grey[600],
+        ),
+      ],
     );
+
+    // Alternative: If you want to add labels, you can use this approach:
+    // return CurvedNavigationBar(
+    //   backgroundColor: Colors.transparent,
+    //   color: Colors.white,
+    //   buttonBackgroundColor: Colors.blue,
+    //   height: 75.h,
+    //   animationDuration: const Duration(milliseconds: 300),
+    //   index: _currentIndex,
+    //   onTap: (index) {
+    //     if (index == 2) {
+    //       _onAddExpenseTapped();
+    //     } else {
+    //       setState(() {
+    //         _currentIndex = index;
+    //       });
+    //     }
+    //   },
+    //   items: [
+    //     Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: [
+    //         Icon(Icons.home, size: 24.sp, color: Colors.white),
+    //         SizedBox(height: 2.h),
+    //         Text('Home', style: TextStyle(fontSize: 10.sp, color: Colors.white)),
+    //       ],
+    //     ),
+    //     Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: [
+    //         Icon(Icons.analytics, size: 24.sp, color: Colors.white),
+    //         SizedBox(height: 2.h),
+    //         Text('Analytics', style: TextStyle(fontSize: 10.sp, color: Colors.white)),
+    //       ],
+    //     ),
+    //     Icon(Icons.add, size: 28.sp, color: Colors.white),
+    //     Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: [
+    //         Icon(Icons.account_balance_wallet, size: 24.sp, color: Colors.white),
+    //         SizedBox(height: 2.h),
+    //         Text('Wallet', style: TextStyle(fontSize: 10.sp, color: Colors.white)),
+    //       ],
+    //     ),
+    //     Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: [
+    //         Icon(Icons.person, size: 24.sp, color: Colors.white),
+    //         SizedBox(height: 2.h),
+    //         Text('Profile', style: TextStyle(fontSize: 10.sp, color: Colors.white)),
+    //       ],
+    //     ),
+    //   ],
+    // );
   }
 
-  Widget _buildNavItem({
-    required IconData icon,
-    required IconData activeIcon,
-    required String label,
-    required int index,
-  }) {
-    final isActive = _currentIndex == index;
+  void _onAddExpenseTapped() async {
+    // Store the previous index before navigating
+    final previousIndex = _currentIndex;
 
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _onNavItemTapped(index),
-        child: SizedBox(
-          height: 60.h,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: EdgeInsets.all(6.w),
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? Colors.blue.withValues(alpha: 0.1)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Icon(
-                  isActive ? activeIcon : icon,
-                  color: isActive ? Colors.blue : Colors.grey[600],
-                  size: 20.sp,
-                ),
-              ),
-              SizedBox(height: 2.h),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 10.sp,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  color: isActive ? Colors.blue : Colors.grey[600],
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+    // Show image picker bottom sheet
+    final File? selectedImage = await ImageService.pickImage(context);
 
-  Widget _buildAddButton() {
-    return GestureDetector(
-      onTap: () => _onAddExpenseTapped(),
-      child: Container(
-        width: 56.w,
-        height: 56.h,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Colors.blue, Colors.purple],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blue.withValues(alpha: 0.3),
-              spreadRadius: 2,
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+    if (selectedImage != null) {
+      // Show success message for selected image
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Receipt image selected (${ImageService.getImageSizeInMB(selectedImage).toStringAsFixed(2)} MB)',
             ),
-          ],
-        ),
-        child: Icon(Icons.add, color: Colors.white, size: 28.sp),
-      ),
-    );
-  }
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
 
-  Widget _buildFloatingActionButton() {
-    return FloatingActionButton(
-      onPressed: () => _onAddExpenseTapped(),
-      backgroundColor: Colors.blue,
-      child: Icon(Icons.add, color: Colors.white, size: 24.sp),
-    );
-  }
+      // Navigate to add expense screen
+      if (mounted) {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
+        );
 
-  void _onNavItemTapped(int index) {
-    if (index != 2) {
-      // Don't set current index for add button
-      setState(() {
-        _currentIndex = index;
-      });
+        // Handle result if needed
+        if (result == true && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Expense added successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
     }
-  }
 
-  void _onAddExpenseTapped() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
-    ).then((_) {
-      // Refresh the current screen when returning from add expense
-      setState(() {
-        // This will trigger a rebuild of the current screen
-      });
+    // Reset to previous index
+    setState(() {
+      _currentIndex = previousIndex;
     });
   }
 }
