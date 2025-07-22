@@ -1,10 +1,9 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
 
 class ApiService {
-  // Store token in SharedPreferences
+  static final Dio _dio = Dio();
   static const String _tokenKey = 'auth_token';
   static const String _userIdKey = 'user_id';
 
@@ -15,28 +14,32 @@ class ApiService {
     String? name,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse(ApiConfig.tokenUrl(userId)),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
+      print('Generating token for user: $email with ID: $userId');
+      print("Requesting token from: ${ApiConfig.tokenUrl(userId)}");
+
+      final response = await _dio.get(
+        ApiConfig.tokenUrl(userId),
+        data: {
           'email': email,
           'userId': userId,
           if (name != null) 'name': name,
-        }),
+        },
+        options: Options(headers: {'Content-Type': 'application/json'}),
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        // Store token and user info locally
-        await _storeToken(data['token']);
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final token = response.data['data'];
+        await _storeToken(token);
         await _storeUserId(userId);
-
-        return {'success': true, 'token': data['token'], 'user': data['user']};
+        return {
+          'success': true,
+          'token': token,
+          'message': response.data['message'],
+        };
       } else {
-        final errorData = jsonDecode(response.body);
         return {
           'success': false,
-          'error': errorData['message'] ?? 'Failed to generate token',
+          'error': response.data['message'] ?? 'Failed to generate token',
         };
       }
     } catch (e) {
@@ -44,45 +47,39 @@ class ApiService {
     }
   }
 
-  /// Store token in SharedPreferences
   static Future<void> _storeToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
   }
 
-  /// Store user ID in SharedPreferences
   static Future<void> _storeUserId(String userId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userIdKey, userId);
   }
 
-  /// Get stored token
   static Future<String?> getStoredToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);
   }
 
-  /// Get stored user ID
   static Future<String?> getStoredUserId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_userIdKey);
   }
 
-  /// Clear stored token and user data
   static Future<void> clearStoredAuth() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_userIdKey);
   }
 
-  /// Check if user has a valid token
   static Future<bool> hasValidToken() async {
     final token = await getStoredToken();
     return token != null && token.isNotEmpty;
   }
 
   /// Make authenticated API requests
-  static Future<http.Response> authenticatedRequest(
+  static Future<Response> authenticatedRequest(
     String endpoint, {
     String method = 'GET',
     Map<String, dynamic>? body,
@@ -99,25 +96,28 @@ class ApiService {
       ...?headers,
     };
 
-    final uri = Uri.parse(ApiConfig.getUrl(endpoint));
+    final url = ApiConfig.getUrl(endpoint);
 
     switch (method.toUpperCase()) {
       case 'GET':
-        return await http.get(uri, headers: requestHeaders);
+        return await _dio.get(url, options: Options(headers: requestHeaders));
       case 'POST':
-        return await http.post(
-          uri,
-          headers: requestHeaders,
-          body: body != null ? jsonEncode(body) : null,
+        return await _dio.post(
+          url,
+          data: body,
+          options: Options(headers: requestHeaders),
         );
       case 'PUT':
-        return await http.put(
-          uri,
-          headers: requestHeaders,
-          body: body != null ? jsonEncode(body) : null,
+        return await _dio.put(
+          url,
+          data: body,
+          options: Options(headers: requestHeaders),
         );
       case 'DELETE':
-        return await http.delete(uri, headers: requestHeaders);
+        return await _dio.delete(
+          url,
+          options: Options(headers: requestHeaders),
+        );
       default:
         throw Exception('Unsupported HTTP method: $method');
     }
@@ -128,15 +128,11 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    final response = await http.post(
-      Uri.parse(ApiConfig.registerUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'name': name,
-        'email': email,
-        'password': password,
-      }),
+    final response = await _dio.post(
+      ApiConfig.registerUrl,
+      data: {'name': name, 'email': email, 'password': password},
+      options: Options(headers: {'Content-Type': 'application/json'}),
     );
-    return jsonDecode(response.body);
+    return response.data;
   }
 }

@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import 'documents/document_api_service.dart';
 
 class ImageService {
   static final ImagePicker _picker = ImagePicker();
@@ -97,22 +100,16 @@ class ImageService {
                 leading: const Icon(Icons.camera_alt),
                 title: const Text('Camera'),
                 onTap: () async {
-                  Navigator.of(context).pop();
                   final image = await openCamera();
-                  if (context.mounted) {
-                    Navigator.of(context).pop(image);
-                  }
+                  if (context.mounted) Navigator.pop(context, image);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library),
                 title: const Text('Gallery'),
                 onTap: () async {
-                  Navigator.of(context).pop();
                   final image = await openGallery();
-                  if (context.mounted) {
-                    Navigator.of(context).pop(image);
-                  }
+                  if (context.mounted) Navigator.pop(context, image);
                 },
               ),
             ],
@@ -141,22 +138,16 @@ class ImageService {
                 leading: const Icon(Icons.camera_alt),
                 title: const Text('Take Photo'),
                 onTap: () async {
-                  Navigator.of(context).pop();
                   final image = await openCamera();
-                  if (image != null && context.mounted) {
-                    Navigator.of(context).pop(image);
-                  }
+                  if (context.mounted) Navigator.pop(context, image);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library),
                 title: const Text('Choose from Gallery'),
                 onTap: () async {
-                  Navigator.of(context).pop();
                   final image = await openGallery();
-                  if (image != null && context.mounted) {
-                    Navigator.of(context).pop(image);
-                  }
+                  if (context.mounted) Navigator.pop(context, image);
                 },
               ),
               ListTile(
@@ -169,6 +160,85 @@ class ImageService {
         );
       },
     );
+  }
+
+  /// Picks an image using camera or gallery, then uploads it as a document.
+  ///
+  /// This is a high-level convenience method that handles the entire flow from
+  /// picking an image to uploading it to the server and showing feedback to the user.
+  /// It uses GetX for showing a loading dialog and success/error snackbars.
+  ///
+  /// [context] is required to show the image picker.
+  /// [documentType] is a string representing the type of document (e.g., 'receipt').
+  ///
+  /// Returns `true` on successful upload, `false` otherwise (e.g., user
+  /// cancelled, permission denied, or upload failed).
+  static Future<bool> pickAndUploadDocument({
+    required BuildContext context,
+    required String documentType,
+  }) async {
+    print('Starting document upload flow for type: $documentType');
+    // 1. Let the user pick an image. `pickImage` handles permissions.
+    final File? imageFile = await pickImage(context);
+    print('Picked image file: ${imageFile?.path}');
+    if (imageFile == null) {
+      // User cancelled the image selection.
+      return false;
+    }
+
+    // 2. Optional: Validate image size before uploading to save bandwidth.
+    if (!isImageSizeAcceptable(imageFile, maxSizeMB: 10.0)) {
+      Get.snackbar(
+        'Image Too Large',
+        'Please select an image smaller than 10MB.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+      return false;
+    }
+
+    // 3. Show a loading indicator while uploading.
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
+
+    try {
+      // 4. Call the combined upload and create document service method.
+      await DocumentApiService.uploadAndCreateDocument(
+        imagePath: imageFile.path,
+        documentType: documentType,
+      );
+      print('Document uploaded successfully: ${imageFile.path}');
+
+      // 5. Handle success: close dialog and show success message.
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      Get.snackbar(
+        'Success',
+        'Document uploaded successfully!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+      return true;
+    } catch (e) {
+      // 6. Handle error: close dialog and show error message.
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      Get.snackbar(
+        'Upload Failed',
+        'An error occurred: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      debugPrint('pickAndUploadDocument failed: $e');
+      return false;
+    }
   }
 
   /// Check if camera permission is granted

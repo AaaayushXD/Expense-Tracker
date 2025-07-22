@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'dart:io';
 import '../services/image_service.dart';
 import 'add_expense_screen.dart';
 import 'dashboard/dashboard_screen.dart';
@@ -196,10 +195,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         child: _buildOptionCard(
                           icon: Icons.document_scanner,
                           title: 'Scan Receipt',
-                          subtitle: 'Use OCR to extract data',
-                          onTap: () {
-                            Navigator.pop(context);
-                            _navigateToAddExpenseWithOcr();
+                          subtitle: 'Upload and save document',
+                          onTap: () async {
+                            Navigator.pop(context); // Close the bottom sheet
+                            await ImageService.pickAndUploadDocument(
+                              context: context,
+                              documentType: 'receipt',
+                            );
                           },
                         ),
                       ),
@@ -268,56 +270,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       }
     } catch (e) {
       print('Error navigating to add expense: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-        );
-      }
-    }
-  }
-
-  void _navigateToAddExpenseWithOcr() async {
-    try {
-      // First, let user select an image
-      final File? selectedImage = await ImageService.pickImage(context);
-
-      if (selectedImage != null) {
-        // Show success message for selected image
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Receipt image selected (${ImageService.getImageSizeInMB(selectedImage).toStringAsFixed(2)} MB)',
-              ),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-
-        // Navigate to add expense screen with the image
-        if (mounted) {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  AddExpenseScreen(initialImage: selectedImage),
-            ),
-          );
-
-          if (result == true && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Transaction added successfully!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        }
-      }
-      // If selectedImage is null (user cancelled), do nothing - just return to main screen
-    } catch (e) {
-      print('Error navigating to add expense with OCR: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
