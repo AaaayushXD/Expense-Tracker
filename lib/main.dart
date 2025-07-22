@@ -7,6 +7,8 @@ import 'firebase_options.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
+import 'screens/add_expense_screen.dart';
+import 'auth/authstate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,12 +57,13 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-          home: const MainNavigationScreen(),
+          home: Builder(builder: (context) => authStateChanges(context)),
           getPages: [
             GetPage(name: '/dashboard', page: () => const DashboardScreen()),
             GetPage(name: '/main', page: () => const MainNavigationScreen()),
             GetPage(name: '/login', page: () => const LoginScreen()),
             GetPage(name: '/signup', page: () => const SignupScreen()),
+            GetPage(name: '/add-expense', page: () => const AddExpenseScreen()),
           ],
         );
       },

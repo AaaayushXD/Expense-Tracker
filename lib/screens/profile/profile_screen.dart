@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../components/custom_button.dart';
 import '../auth/login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final displayName = user?.displayName ?? 'No Name';
+    final email = user?.email ?? 'No Email';
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -31,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
           padding: EdgeInsets.all(20.w),
           child: Column(
             children: [
-              _buildProfileHeader(),
+              _buildProfileHeader(displayName, email),
               SizedBox(height: 24.h),
               _buildStatsSection(),
               SizedBox(height: 24.h),
@@ -45,7 +50,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(String displayName, String email) {
     return Container(
       padding: EdgeInsets.all(24.w),
       decoration: BoxDecoration(
@@ -69,12 +74,12 @@ class ProfileScreen extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           Text(
-            'John Doe',
+            displayName,
             style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 8.h),
           Text(
-            'john.doe@example.com',
+            email,
             style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
           ),
           SizedBox(height: 16.h),
@@ -233,10 +238,15 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildLogoutButton(BuildContext context) {
     return CustomButton(
       text: 'Logout',
-      onPressed: () {
-        Navigator.push(
+      onPressed: () async {
+        await FirebaseAuth.instance.signOut();
+        try {
+          await GoogleSignIn().signOut();
+        } catch (_) {}
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
         );
       },
       backgroundColor: Colors.red[400]!,

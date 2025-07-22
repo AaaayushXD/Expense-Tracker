@@ -162,7 +162,7 @@ class ImageService {
               ListTile(
                 leading: const Icon(Icons.cancel),
                 title: const Text('Cancel'),
-                onTap: () => Navigator.of(context).pop(),
+                onTap: () => Navigator.of(context).pop(null),
               ),
             ],
           ),

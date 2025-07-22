@@ -8,6 +8,10 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
+}
+
 android {
     namespace = "com.example.expense_tracker"
     compileSdk = flutter.compileSdkVersion

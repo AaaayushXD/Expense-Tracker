@@ -71,11 +71,13 @@ class _SignupScreenState extends State<SignupScreen> {
     }
     try {
       await SignupController().signup(
+        _nameController.text,
         _emailController.text,
         _passwordController.text,
       );
     } catch (e) {
       print('Signup Failed: $e');
+      // Show error message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

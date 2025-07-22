@@ -203,11 +203,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   .cast<Widget>(),
               SizedBox(height: 20.h),
 
-              // Add Expense Button
+              // Add Transaction Button
               CustomButton(
-                text: 'Add New Expense',
+                text: 'Add Transaction',
                 onPressed: () {
-                  Navigator.pushNamed(context, '/add-expense');
+                  // This will be handled by the main navigation screen
+                  // when the user taps the add button in the bottom navigation
                 },
                 icon: Icon(Icons.add, color: Colors.white, size: 20.sp),
               ),

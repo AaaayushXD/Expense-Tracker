@@ -1,54 +1,27 @@
 {
   "project_info": {
     "project_number": "661850068763",
+    "firebase_url": "https://expense-tracker-1e3a2-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "expense-tracker-1e3a2",
     "storage_bucket": "expense-tracker-1e3a2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:661850068763:android:ed0eb1346045400b0be5be",
+        "mobilesdk_app_id": "1:661850068763:android:9e10cdf5a7cfba660be5be",
         "android_client_info": {
           "package_name": "com.example.expense_tracker"
         }
       },
       "oauth_client": [
         {
-          "client_id": "661850068763-09ivm7v2ffl1i4opumf4s37u1hpnotch.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCoKpR3vOFyWqsu1D5wDBMeVErKAU6rI1U"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "661850068763-09ivm7v2ffl1i4opumf4s37u1hpnotch.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "661850068763-g0p1vec300rfba3d1qhe5519jtqf3ius.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.expenseTracker"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:661850068763:android:8f34e7081c36e5aa0be5be",
-        "android_client_info": {
-          "package_name": "com.expense_tracker"
-        }
-      },
-      "oauth_client": [
+          "client_id": "661850068763-57m08g2pnirrujvg3ocqk519vrc30v1e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.expense_tracker",
+            "certificate_hash": "42a333c95ebc7c805e3b22cb50ae37a9ff927495"
+          }
+        },
         {
           "client_id": "661850068763-09ivm7v2ffl1i4opumf4s37u1hpnotch.apps.googleusercontent.com",
           "client_type": 3

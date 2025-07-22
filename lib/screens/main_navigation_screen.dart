@@ -22,7 +22,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     const DashboardScreen(),
     const AnalyticsScreen(),
-    const SizedBox(), // Placeholder for add expense
+    const DashboardScreen(), // Use DashboardScreen as placeholder for add expense
     const WalletScreen(),
     const ProfileScreen(),
   ];
@@ -44,13 +44,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       animationDuration: const Duration(milliseconds: 300),
       index: _currentIndex,
       onTap: (index) {
-        setState(() {
-          _currentIndex = index;
-        });
-
         if (index == 2) {
-          // Handle add expense button
+          // Handle add expense button - don't change current index
           _onAddExpenseTapped();
+        } else {
+          setState(() {
+            _currentIndex = index;
+          });
         }
       },
       items: [
@@ -138,48 +138,191 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   void _onAddExpenseTapped() async {
-    // Store the previous index before navigating
-    final previousIndex = _currentIndex;
+    // Show options bottom sheet
+    _showAddOptionsBottomSheet();
+  }
 
-    // Show image picker bottom sheet
-    final File? selectedImage = await ImageService.pickImage(context);
-
-    if (selectedImage != null) {
-      // Show success message for selected image
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Receipt image selected (${ImageService.getImageSizeInMB(selectedImage).toStringAsFixed(2)} MB)',
+  void _showAddOptionsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20.r),
+            topRight: Radius.circular(20.r),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 12.h),
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2.r),
+              ),
             ),
+            Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                children: [
+                  Text(
+                    'Add Transaction',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 24.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildOptionCard(
+                          icon: Icons.edit_note,
+                          title: 'Manual Entry',
+                          subtitle: 'Fill out the form',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _navigateToAddExpense();
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 16.w),
+                      Expanded(
+                        child: _buildOptionCard(
+                          icon: Icons.document_scanner,
+                          title: 'Scan Receipt',
+                          subtitle: 'Use OCR to extract data',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _navigateToAddExpenseWithOcr();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20.h),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.grey[200]!),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 32.sp, color: Colors.blue),
+            SizedBox(height: 12.h),
+            Text(
+              title,
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToAddExpense() async {
+    try {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
+      );
+
+      if (result == true && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Transaction added successfully!'),
             backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
           ),
         );
       }
-
-      // Navigate to add expense screen
+    } catch (e) {
+      print('Error navigating to add expense: $e');
       if (mounted) {
-        final result = await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const AddExpenseScreen()),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
+      }
+    }
+  }
 
-        // Handle result if needed
-        if (result == true && mounted) {
+  void _navigateToAddExpenseWithOcr() async {
+    try {
+      // First, let user select an image
+      final File? selectedImage = await ImageService.pickImage(context);
+
+      if (selectedImage != null) {
+        // Show success message for selected image
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Expense added successfully!'),
+            SnackBar(
+              content: Text(
+                'Receipt image selected (${ImageService.getImageSizeInMB(selectedImage).toStringAsFixed(2)} MB)',
+              ),
               backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
             ),
           );
         }
+
+        // Navigate to add expense screen with the image
+        if (mounted) {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AddExpenseScreen(initialImage: selectedImage),
+            ),
+          );
+
+          if (result == true && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Transaction added successfully!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        }
+      }
+      // If selectedImage is null (user cancelled), do nothing - just return to main screen
+    } catch (e) {
+      print('Error navigating to add expense with OCR: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
       }
     }
-
-    // Reset to previous index
-    setState(() {
-      _currentIndex = previousIndex;
-    });
   }
 }
